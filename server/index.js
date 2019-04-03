@@ -2,6 +2,7 @@ const express = require("express");
 const path = require("path");
 const next = require("next");
 const bodyParser = require("body-parser");
+const compression = require("compression");
 
 //Setting nextjs
 const dev = process.env.NODE_ENV !== "production";
@@ -11,10 +12,17 @@ const handle = app.getRequestHandler();
 //IMPORT ROUTING
 const auth = require("./routes/auth");
 
+const setCustomHeaderFunc = (req, res, next) => {
+  res.set("SpecialCustomHeader", "super-awesome-value");
+  next();
+};
+
 app
   .prepare()
   .then(() => {
     const server = express();
+    server.use(compression());
+    server.use("*", setCustomHeaderFunc);
     server.use(bodyParser.urlencoded({ extended: true }));
     server.use(bodyParser.json());
 
